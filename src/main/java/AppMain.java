@@ -7,6 +7,7 @@ import com.rethinkdb.net.Cursor;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AppMain {
     public static final RethinkDB r = RethinkDB.r;
@@ -146,6 +147,31 @@ public class AppMain {
         } else System.out.println("Nie znaleziono profilu!");
     }
 
+    private static void getCrimeStatistics(Connection connection) {
+        System.out.println("Przetwarzanie danych z użyciem projection");
+        Map<String, Integer> ageBrackets = new HashMap<>();
+        ageBrackets.put("1. <20", 0);
+        ageBrackets.put("2. 20-30", 0);
+        ageBrackets.put("3. 31-50", 0);
+        ageBrackets.put("4. 51-65", 0);
+        ageBrackets.put("5. 65+", 0);
+        int totalCrimes = 0;
+        long age;
+        int crimes;
+        Cursor<HashMap<String, Object>> cursor = r.table(tableName).withFields("dob", "crimes").run(connection);
+        for (HashMap<String, Object> d : cursor) {
+            age = ConsoleUtils.calculateAge(d.get("dob").toString());
+            crimes = ((List<Object>)d.get("crimes")).size();
+            totalCrimes += crimes;
+            if (age < 20) ageBrackets.replace("1. <20", ageBrackets.get("1. <20")+crimes);
+            if (age >= 20 && age <= 30) ageBrackets.replace("2. 20-30", ageBrackets.get("2. 20-30")+crimes);
+            if (age >= 31 && age <= 50) ageBrackets.replace("3. 31-50", ageBrackets.get("3. 31-50")+crimes);
+            if (age >= 51 && age <= 65) ageBrackets.replace("4. 51-65", ageBrackets.get("4. 51-65")+crimes);
+            if (age > 65) ageBrackets.replace("5. 65+", ageBrackets.get("5. 65+")+crimes);
+        }
+        ConsoleUtils.printCrimeGraph(ageBrackets, totalCrimes);
+    }
+
     public static void main(String[] args) {
         Connection conn = r.connection().hostname("localhost").port(28015).connect();
         // Nie twórz od nowa bazy i tablicy
@@ -174,8 +200,10 @@ public class AppMain {
                     getByQuery(conn);
                     break;
                 case 'o':
+                    getCrimeStatistics(conn);
                     break;
                 case 'z':
+                    conn.close();
                     return;
                 default:
                     System.out.println("Podano nieznaną operację. Spróbuj ponownie.");
