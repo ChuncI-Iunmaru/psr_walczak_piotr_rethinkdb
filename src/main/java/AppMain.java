@@ -97,7 +97,7 @@ public class AppMain {
             System.out.println("\nPodaj nazwisko. Obecna wartość '" + result.get("surname")+"'. Pozostaw puste by nie zmieniać");
             String newSurname = ConsoleUtils.getText(0);
             if (!newSurname.isEmpty()) {
-                r.table(tableName).get(id).update(r.hashMap("surname", newName)).run(connection);
+                r.table(tableName).get(id).update(r.hashMap("surname", newSurname)).run(connection);
             }
 
             String newGender = ConsoleUtils.pickGender(result.get("gender").toString());
@@ -142,7 +142,7 @@ public class AppMain {
     }
 
     private static void getCrimeStatistics(Connection connection) {
-        System.out.println("Przetwarzanie danych z użyciem projection");
+        System.out.println("Przetwarzanie danych");
         Map<String, Integer> ageBrackets = new HashMap<>();
         ageBrackets.put("1. <20", 0);
         ageBrackets.put("2. 20-30", 0);
@@ -172,7 +172,8 @@ public class AppMain {
         //System.out.println(r.dbCreate("policyjnaDB").run(conn).toString());;
         //System.out.println(r.db("policyjnaDB").tableCreate("criminals").run(conn).toString());
         conn.use("policyjnaDB");
-
+        System.out.println("PSR Lab 5 aplikacja na temat 7) Policja");
+        System.out.println("Piotr Walczak gr 1ID22B");
         while (true) {
             switch (ConsoleUtils.getMenuOption()) {
                 case 'd':
