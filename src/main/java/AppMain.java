@@ -1,7 +1,4 @@
 import com.rethinkdb.RethinkDB;
-import com.rethinkdb.gen.exc.ReqlError;
-import com.rethinkdb.gen.exc.ReqlQueryLogicError;
-import com.rethinkdb.model.MapObject;
 import com.rethinkdb.net.Connection;
 import com.rethinkdb.net.Cursor;
 
@@ -10,37 +7,34 @@ import java.util.List;
 import java.util.Map;
 
 public class AppMain {
-    public static final RethinkDB r = RethinkDB.r;
+    private static final RethinkDB r = RethinkDB.r;
     private static final String tableName = "criminals";
 
     private static void insertCriminal(Connection connection) {
-//        HashMap<String, Object> run = r.table("criminals").insert(
-//                r.hashMap("name", "Jan")
-//                .with("surname", "Kowalski")
-//                .with("gender", "M")
-//                .with("build", "szczupła")
-//                .with("height", 183)
-//                .with("characteristics", r.array("okulary"))
-//                .with("crimes", r.array("rozbój", "podpalenie"))
-//                .with("notes", "Niebezpieczny")
-//                .with("dob", "12-11-1987")).run(connection);
-        MapObject criminal = r.hashMap();
         System.out.println("\nPodaj imię: ");
-        criminal.put("name", ConsoleUtils.getText(1));
+        String name = ConsoleUtils.getText(1);
         System.out.println("Podaj nazwisko: ");
-        criminal.put("surname", ConsoleUtils.getText(1));
-        criminal.put("gender", ConsoleUtils.pickGender(""));
-        criminal.put("build", ConsoleUtils.getBuild(""));
-        criminal.put("height", ConsoleUtils.getHeight(0L));
+        String surname = ConsoleUtils.getText(1);
+        String gender = ConsoleUtils.pickGender("");
+        String build = ConsoleUtils.getBuild("");
+        Long height = ConsoleUtils.getHeight(0L);
         System.out.println("Podaj cechy szczególne: ");
-        criminal.put("characteristics", ConsoleUtils.getListOfTexts(";", 0));
+        List<String> characteristics = ConsoleUtils.getListOfTexts(";", 0);
         System.out.println("Podaj przestępstwa: ");
-        criminal.put("crimes", ConsoleUtils.getListOfTexts(";", 1));
+        List<String> crimes = ConsoleUtils.getListOfTexts(";", 1);
         System.out.println("Podaj uwagi: ");
-        criminal.put("notes", ConsoleUtils.getText(0));
-        criminal.put("dob", ConsoleUtils.getFormattedDate(""));
+        String notes = ConsoleUtils.getText(0);
+        String dob = ConsoleUtils.getFormattedDate("");
 
-        HashMap<String, Object> run = r.table(tableName).insert(criminal).run(connection);
+        HashMap<String, Object> run = r.table(tableName).insert(r.hashMap("name", name)
+                .with("surname", surname)
+                .with("gender", gender)
+                .with("build", build)
+                .with("height", height)
+                .with("characteristics", characteristics)
+                .with("crimes", crimes)
+                .with("notes", notes)
+                .with("dob", dob)).run(connection);
         System.out.println("Utworzone klucze: " + run.get("generated_keys"));
     }
 
