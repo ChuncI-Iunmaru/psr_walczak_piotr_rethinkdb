@@ -168,9 +168,11 @@ public class AppMain {
 
     public static void main(String[] args) {
         Connection conn = r.connection().hostname("localhost").port(28015).connect();
-        // Nie twórz od nowa bazy i tablicy
-        //System.out.println(r.dbCreate("policyjnaDB").run(conn).toString());;
-        //System.out.println(r.db("policyjnaDB").tableCreate("criminals").run(conn).toString());
+        // Czyść bazę danych
+        System.out.println(r.dbDrop("policyjnaDB").run(conn).toString());
+        System.out.println(r.dbCreate("policyjnaDB").run(conn).toString());;
+        System.out.println(r.db("policyjnaDB").tableCreate("criminals").run(conn).toString());
+
         conn.use("policyjnaDB");
         System.out.println("PSR Lab 5 aplikacja na temat 7) Policja");
         System.out.println("Piotr Walczak gr 1ID22B");
